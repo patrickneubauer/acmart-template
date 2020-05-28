@@ -1,0 +1,55 @@
+language: generic
+
+before_install:
+  # Install makeindex, if you do not use an index you can remove this (also remove the extra makeindex call).
+  - sudo apt-get install texlive-binaries
+
+install:
+  # Silent install from conda docs
+  # https://conda.io/docs/user-guide/install/macos.html#install-macos-silent
+  # adapted using
+  # https://conda.io/docs/user-guide/tasks/use-conda-with-travis-ci.html
+
+  # Needed to check if conda already installed
+  - export PATH="$HOME/miniconda/bin:$PATH"
+
+  # If not yet installed, obtain Miniconda
+  # and tectonic
+  # From tectonic docs
+  # https://tectonic-typesetting.github.io/en-US/install.html#the-anaconda-method
+  - if ! command -v conda > /dev/null; then
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      bash miniconda.sh -b -p $HOME/miniconda -u;
+      conda config --add channels conda-forge;
+      conda config --set always_yes yes;
+      conda install tectonic==0.1.12;
+    fi
+  # Install biber if required for compiling the references.
+  # Biber version should match the biblatex version of Tectonic
+  - conda install -c malramsay biber==2.12 --yes
+  - conda info -a
+  # Workaround if a specific bundle is needed
+#  - sudo mkdir -p ~/.config/Tectonic/
+#  - echo "[[default_bundles]]" | sudo tee --append ~/.config/Tectonic/config.toml
+#  - sudo echo "url = \"https://tectonic.newton.cx/bundles/tlextras-2018.1r0/bundle.tar\"" | sudo tee --append ~/.config/Tectonic/config.toml
+cache:
+  directories:
+    - $HOME/miniconda
+    - $HOME/.cache/Tectonic
+script: # Change working directory each time so including files will work. Change back so the pdfs can be found for deployment. This way, building multiple files goes well.
+ - cd ./
+ # Run tectonic once to generate intermediate files
+ - tectonic --keep-intermediates --reruns 0 ./sample-sigconf.tex
+ # If a bcf file exists run biber to compile references
+ - if [ -f "sample-sigconf.bcf" ]; then biber sample-sigconf; fi
+
+ # Final run of tectonic to create output
+ - tectonic ./sample-sigconf.tex --print
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: TUeOIst1u2UFVbqcT9ljuPYtwoQfOQxOdLK5HVOgKVliZqMolj87kX4AN/cmJyGRN38Gzfzc8pPGEluUsbLWMuWrNQcEg86tjCtmmgZfPDOcbe3Y8Jz0amT7ImGIFTgK7+n+1xDgqOX7BI1YCB9BviH8fPTxU6N0pOokqW0x7k9ig+jN86f1xZ8RU6Cz4ai00rs4co0EVK7P5jPLBRspIe5Pr4e6V39ksD1xBPtBuUwUPYTs9S0vtWouf0frK4DKVE+7vP/pMi97TVNTfTMLTl9Udl4XjXkYp/LiRKT7KT4NDO9bMgEc7dIY7h+uM8R6vwxeT9Oep0oNBy8lmLcIkVMvt/zFy2PzsPLeAbm429U8UCoxd9AKUT9ZxATByJ8rdzILgbb1/DGdjHhlqnX/3TAbqMRQ79B0gWDLAy15xZ0NqXbSf9eGbn85Y3LwRZhIR6YTTrsP/HEezGcxnK8m4Ct5+q6bF4ZOCiSqGLU9H8t7PkgABJ4jamF+v0/st5eURUzMKq7RJgE3REbGGfEIc9WT8VvRkoCMzT5nDpKiBV72OzrVnTyJGw+zSYdClwq/Bg4b+oqFEF2NYJXSwdtd8TDxYY2CFkerhmA12H40GWEC1rS17s7QisQX5F9HfRWCumjsmjCFqRfmXabQQZ4Jd6VCUKWNCu9kg/+9b9Izo/Y=
+  file: ./sample-sigconf.pdf
+  on:
+    branch: master
