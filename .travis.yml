@@ -21,9 +21,7 @@ script:
 deploy:
   provider: releases
   skip_cleanup: true
+  api_key: $GITHUB_TOKEN
   file: "./sample-sigconf.pdf"
   on:
     branch: master
-env:
-  global:
-    secure: XvXnoj643VA6wJig6cwtvmIe1SnL2UDUUR5pCj8eOWufrqG8NaCJAkcMY5KGF7N7wVwyxQHTBWJ8nbPohLHbMCBrzlLIkTpqm+RWP4X2Ujleq8ZqNNbb+BrDMlcPTXkjCsiaT9dAHCzU7KqYQ80FD/fGk/JJmzDCd8ezIad7PtsCtUqaDui1YOapwhcIgtFwE5Uyodl8oI7PPInQIiZf22wn8pS0PCh8gW54QWmzlPxeki/dYc7eT2Ls6urKpmPRmaZeuvWt76T/W36kuLEMreQNYNKOvv+prwpyTQoJBn+RrSivD3dJRBMHUQ8yB8HCvVEIk01//dpfam2AmvPDo+HlkXV+VqhVKq4xV16OtGBGCbx7iA8n3y3NnUGQF1URYfKI4tlnQbKazEYjlovJBYHbJGExN6Q9Rudk5uzeJhEtddHBCbZz7RAUBMqLQqwltaOOExSIHDWm322LBlKTrM9y7El+v1hzBehtSyQ7DArmF+XQjJ8+yTsPAOQRiR0dG4nKe/15c/XBzDmzST//HtOfQ11Xi9vU2QS6T4pWLghEkvCioLxwIWRIrkr+Sb5waCPKurdx2ZRbUX6lXu0qQ/LiQirPScQkdRYFytUKgFRIlfYC5uIGnIbN6hN+ZNgCvMY78cMswl9q49wWwrerymNYFjcoSNH/TMoQU8oGQm4=
