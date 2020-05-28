@@ -1,50 +1,23 @@
 language: generic
-
 before_install:
-  # Install makeindex, if you do not use an index you can remove this (also remove the extra makeindex call).
-  - sudo apt-get install texlive-binaries
-
+- sudo apt-get install texlive-binaries
 install:
-  # Silent install from conda docs
-  # https://conda.io/docs/user-guide/install/macos.html#install-macos-silent
-  # adapted using
-  # https://conda.io/docs/user-guide/tasks/use-conda-with-travis-ci.html
-
-  # Needed to check if conda already installed
-  - export PATH="$HOME/miniconda/bin:$PATH"
-
-  # If not yet installed, obtain Miniconda
-  # and tectonic
-  # From tectonic docs
-  # https://tectonic-typesetting.github.io/en-US/install.html#the-anaconda-method
-  - if ! command -v conda > /dev/null; then
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      bash miniconda.sh -b -p $HOME/miniconda -u;
-      conda config --add channels conda-forge;
-      conda config --set always_yes yes;
-      conda install tectonic==0.1.12;
-    fi
-  # Install biber if required for compiling the references.
-  # Biber version should match the biblatex version of Tectonic
-  - conda install -c malramsay biber==2.12 --yes
-  - conda info -a
-  # Workaround if a specific bundle is needed
-#  - sudo mkdir -p ~/.config/Tectonic/
-#  - echo "[[default_bundles]]" | sudo tee --append ~/.config/Tectonic/config.toml
-#  - sudo echo "url = \"https://tectonic.newton.cx/bundles/tlextras-2018.1r0/bundle.tar\"" | sudo tee --append ~/.config/Tectonic/config.toml
+- export PATH="$HOME/miniconda/bin:$PATH"
+- if ! command -v conda > /dev/null; then wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  -O miniconda.sh; bash miniconda.sh -b -p $HOME/miniconda -u; conda config --add
+  channels conda-forge; conda config --set always_yes yes; conda install tectonic==0.1.12;
+  fi
+- conda install -c malramsay biber==2.12 --yes
+- conda info -a
 cache:
   directories:
-    - $HOME/miniconda
-    - $HOME/.cache/Tectonic
-script: # Change working directory each time so including files will work. Change back so the pdfs can be found for deployment. This way, building multiple files goes well.
- - cd ./
- # Run tectonic once to generate intermediate files
- - tectonic --keep-intermediates --reruns 0 ./sample-sigconf.tex
- # If a bcf file exists run biber to compile references
- - if [ -f "sample-sigconf.bcf" ]; then biber sample-sigconf; fi
-
- # Final run of tectonic to create output
- - tectonic ./sample-sigconf.tex --print
+  - "$HOME/miniconda"
+  - "$HOME/.cache/Tectonic"
+script:
+- cd ./
+- tectonic --keep-intermediates --reruns 0 ./sample-sigconf.tex
+- if [ -f "sample-sigconf.bcf" ]; then biber sample-sigconf; fi
+- tectonic ./sample-sigconf.tex --print
 deploy:
   provider: releases
   skip_cleanup: true
@@ -53,4 +26,4 @@ deploy:
     branch: master
 env:
   global:
-    secure: BYzI2VI5E192WU7xxyaFsdCl2a6ZTLy48VFBussOqZgGz1KqGKF3g9R0ZjbooFWQV3AGSyJS3YrxtcMN85pKpbXZp0HKl656Ve6w//+BYrVcyds6YqHvMh+W4MPPfDcGP88a/9ZNoaplnNCgarvcmmV08g9ee6oKk9Dh3b3oOUogJGluKggzfutlfsb3sz2VvmiDtO1+o5u/R0oB448ECGq6SFjMq6KTiLqg1bNA512tcB0r+JDqdaCvBqwKD0m7xw6U6R5sq335WdbsTn8VrOPR+DDvCIfSx8i9IbYhtZHKOKNNCoV7UjEoaIII4npoTTr6SF1TuEyX7ju84j6K/3Ye6NK7CCAF2NQhtNl2ExajOeNUPb2ALl4BhPQf9qn3DnrwG5oEdQym+K/1vWML9cwAm7daeLDGPq5rwa3ExmvTmaTT/+pSAZXJQekuyVFp95bYs6ymHIZcx8zNm2a5hM9xfnhSh9isIstpFEEROUjEJf66sp28qQT37FX9WvMXUKLwVk/l4/hud7R/3co9I70MncyPuo/XdSyPH/L5FgzTxny7N4T4IccAgY0RE92PjjM+M0CWVzMyZxGKtFgEn78Q5PrRqXVjn103wjQrYjxfJmqICotTQwZh+UCIcy0S5MNnY4sUwiWnTBHZ1geypWCG8KpAcFy1UMgbS+Qx6W8=
+    secure: dXfr0wI8VTRVZQ18nX8/ztoBAhY864w3/sfFAlbjVSTVTH+1+ym1020BTUFhQxdncHry+NuUVJPa4OpkXY/Hvvm8Y1n5S3hbvRUrxXp3N9oQS7i+oSqco9GmNqIWUagn7j4GCYnutmnyx3axbRCortF1ac8/rOMpnlWx9OevisLRHNR8ZRlT39C0fMgnRwBEklRqtU6yJ9ziPqtf7hNNkpvaEQ7Ma7QW5JuqbhPBaN8d++IV9VM+cAr8q23cU7v8uFHo8E8f3LuEHQsqtSuCZAZ1fWDhjM9h8BtKMthy2rwTvp6J1A+yjIUeJapXclvh9gMmpvfbj5zMuBPY6XEaysXAbik4C3dj6e1gIFjJ62tp15sh6nswzBeJEhnzfTJ76j5cvQlF4UcC4Y6sE0FTF4TWeXBF7c06e3mAZhzAjp0GZAe9mWQC/FGdkTJb7Sa8bHBNtrbu+ES3qiVYGka2GIamkke1XU0qbxrhUxTnK41yUU5oDemSQSC/nNp2wV+jMAeifiewA8dCHJR/OrWCCkBLGUjWzpcM6kiPhwLwcg5BAJ1H4LubE3+p5HY/xs5m9dO2FNAdxUdetnUZXP0lNu7Pzi05Urj4AaXgAohMnK7cdBfKLVxuS0rgkhUKm7Xw3NS47xZ71IMbhmXIzK3SxBEPEWW9G8NNS9lBiW1RMno=
