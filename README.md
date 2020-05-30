@@ -1,4 +1,4 @@
-# [![Build Status](https://travis-ci.org/patrickneubauer/acmart-template.svg?branch=master)](https://travis-ci.org/patrickneubauer/acmart-template.svg?branch=master)
+# [![Build Status](https://travis-ci.org/patrickneubauer/acmart-template.svg?branch=master)](https://travis-ci.org/patrickneubauer/acmart-template)
 
 # acmart-template
 
